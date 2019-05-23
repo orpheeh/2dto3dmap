@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+}
+
+header {
+    width: 100%;
+    height: 60px;
+    background-image: linear-gradient( #083e69, #171566 );
+}
+
+header h1 {
+    font-size: 20px;
+    font-weight: normal;
+    padding: 20px;
+    color: white;
+}
+
+.canvas-container {
+    display: flex;
+    height: 500px;
+}
+
+canvas {
+    border: 2px solid #cccccc;
+    margin: 20px;
+    flex-grow: 1;
+
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    margin: 20px;
+    background-image: linear-gradient( #083e69, #171566 );
+    border-radius: 5px;
+}
+
+a.btn-off {
+    background-image: linear-gradient(#777777, #cccccc);
+}
+
+.btn-off:hover {
+    cursor: none;
+}
