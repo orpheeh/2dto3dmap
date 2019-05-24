@@ -10,8 +10,8 @@ const canvas3D = document.querySelector('.canvas-3d');
 canvas2D.width = canvas2D.clientWidth;
 canvas2D.height = canvas2D.clientHeight;
 
-canvas3D.width = canvas2D.clientWidth;
-canvas3D.height = canvas2D.clientHeight;
+canvas3D.width = canvas3D.clientWidth;
+canvas3D.height = canvas3D.clientHeight;
 
 /* {
     murs_ext: [ {}, {}, ... ]
@@ -93,3 +93,26 @@ delete_bat.addEventListener('click', function(){
         }
     }
 });
+
+//THREE JS
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, canvas3D.clientWidth / canvas3D.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer( { canvas: canvas3D } );
+renderer.setSize(canvas3D.clientWidth, canvas3D.clientHeight);
+
+const control = new THREE.OrbitControls(camera);
+
+//Draw geometry
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({color: 0xff0000});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+const animate = function(){
+    requestAnimationFrame(animate);
+    control.update();
+    //update();
+    renderer.render(scene, camera);
+}
+animate();
