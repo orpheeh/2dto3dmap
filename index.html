@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Rubik&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" 
+    integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     <title>2D to 3D Map</title>
 </head>
 
@@ -18,24 +20,27 @@
 
     <div class="main-container">
         <div class="canvas-container">
-            <canvas class="2d-canvase">
+            <canvas class="canvas-2d">
             </canvas>
 
-            <canvas class="3d-canvas">
+            <canvas class="canvas-3d">
             </canvas>
         </div>
 
         <div class="control-panel">
             <a href="#" class="btn" id="new-batiment">Nouveau batiment</a>
-            <a href="#" class="btn btn-off" id="begin-draw">Commencer à dessiner</a>
-            <a href="#" class="btn btn-off" id="stop-draw">Arrêter de dessiner</a>
 
-            <select name="batiments" id="batiments-list">
-                <option value="none">-- Choisir un batiment --</option>
-            </select>
+            <div class="batiment-control">
+                <select name="batiments" id="select-bat">
+                    <option value="none">-- Batiment à éditer --</option>
+                </select>
+                <a href="#" class="minus-btn btn-off" id="delete-bat" title="Supprimer le batiment"><i class="fa fa-minus-square"></i></a>
+            </div>
         </div>
     </div>
 
+
+    <script src="./script.js"></script>
 </body>
 
 </html>
