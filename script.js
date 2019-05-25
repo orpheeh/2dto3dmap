@@ -3,19 +3,17 @@ const begin_draw = document.querySelector('#begin-draw');
 const stop_draw = document.querySelector('#stop-draw');
 const select_batiment = document.querySelector('#select-bat');
 const delete_bat = document.querySelector('#delete-bat');
-
 const canvas2D = document.querySelector('.canvas-2d');
 const canvas3D = document.querySelector('.canvas-3d');
 
 canvas2D.width = canvas2D.clientWidth;
 canvas2D.height = canvas2D.clientHeight;
-
 canvas3D.width = canvas3D.clientWidth;
 canvas3D.height = canvas3D.clientHeight;
 
 /* {
     murs_ext: [ {}, {}, ... ]
-    murs_secondaire: [ [{}, {}], ... ]
+    murs_int: [ [{}, {}], ... ]
 }*/
 const LES_BATIMENTS = [];
 let pointSuivant = undefined;
@@ -65,6 +63,7 @@ canvas2D.addEventListener('click', function () {
     console.log(LES_BATIMENTS);
     if(indexBatimentCourant >= 0){
         LES_BATIMENTS[indexBatimentCourant].mur_ext.push(pointSuivant);
+        create3DMap();
     }
 });
 
@@ -94,6 +93,7 @@ delete_bat.addEventListener('click', function(){
     }
 });
 
+
 //THREE JS
 
 const scene = new THREE.Scene();
@@ -101,18 +101,57 @@ const camera = new THREE.PerspectiveCamera(75, canvas3D.clientWidth / canvas3D.c
 const renderer = new THREE.WebGLRenderer( { canvas: canvas3D } );
 renderer.setSize(canvas3D.clientWidth, canvas3D.clientHeight);
 
-const control = new THREE.OrbitControls(camera);
+const control = new THREE.OrbitControls(camera, renderer.domElement);
+camera.position.set(0, 10, 10);
 
-//Draw geometry
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+const DEFAULT_WALL_HEIGHT = 0.5;
+const DEFAULT_WALL_DEPTH = 0.05;
+
+
+function create3DMap(){
+    scene.remove.apply(scene, scene.children);
+    for(let i = 0; i < LES_BATIMENTS.length; i++){
+        create3DBatiment(LES_BATIMENTS[i]);
+    }
+}
+
+function create3DBatiment(batiment){
+    const group = new THREE.Group();
+    for(let i = 0; i < batiment.mur_ext.length-1; i++){
+        const p1 = normalize({ x: batiment.mur_ext[i].x, y: batiment.mur_ext[i].y });
+        const p2 = normalize({ x: batiment.mur_ext[i+1].x, y: batiment.mur_ext[i+1].y });
+        const width = Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y));
+        const height = DEFAULT_WALL_HEIGHT;
+        const depth = DEFAULT_WALL_DEPTH;
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+        const material = new THREE.MeshBasicMaterial({color: 0xff00ff});
+        const mesh = new THREE.Mesh(geometry, material);
+        const rot = rotation(p2, p1);
+        const middle = middlePoint(p1, p2);
+        mesh.position.x =  middle.x;
+        mesh.position.z =  -middle.y;
+        mesh.rotation.y = rot;
+
+        group.add(mesh);
+    }
+    scene.add(group);
+}
+
+function normalize(p){
+    return  { x: (p.x / canvas3D.clientWidth) * 2 - 1, y: (p.y / canvas3D.clientHeight) * 2 + 1 };
+}
+
+function rotation(p1, p2){
+    return Math.atan((p1.y - p2.y) / (p1.x - p2.x));
+}
+
+function middlePoint(p1, p2){
+    return { x: (p1.x + p2.x) /2, y: (p1.y + p2.y) /2 };
+}
 
 const animate = function(){
     requestAnimationFrame(animate);
     control.update();
-    //update();
     renderer.render(scene, camera);
 }
 animate();
