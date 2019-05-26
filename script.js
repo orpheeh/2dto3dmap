@@ -5,7 +5,6 @@ const select_batiment = document.querySelector('#select-bat');
 const delete_bat = document.querySelector('#delete-bat');
 const canvas2D = document.querySelector('.canvas-2d');
 const canvas3D = document.querySelector('.canvas-3d');
-
 const add_step = document.querySelector('#new-step');
 const remove_step = document.querySelector('#delete-step');
 
@@ -16,7 +15,6 @@ canvas3D.height = canvas3D.clientHeight;
 
 window.onload = function () {
     const radios = document.querySelectorAll('.draw-control input');
-    console.log('change draw sector 1');
 
     for (let i = 0; i < radios.length; i++) {
         radios[i].addEventListener('click', function () {
@@ -26,10 +24,6 @@ window.onload = function () {
     }
 }
 
-/* {
-    murs_ext: [ {}, {}, ... ]
-    murs_int: { step: [ [{p1:{}, p2:{}}, ...], .... ],  current_step: 0 }
-}*/
 const LES_BATIMENTS = [];
 let pointSuivant = undefined;
 let indexBatimentCourant = -1;
@@ -46,10 +40,9 @@ ctx.strokeText('Position de la souris: ( ... , ... )', 20, 20, 200);
 canvas2D.addEventListener('mousemove', function (event) {
     const mousex = event.x - 20;
     const mousey = event.y - 80;
-
     //Montrer la position de la souris
     ctx.clearRect(0, 0, canvas2D.clientWidth, canvas2D.clientHeight);
-    ctx.strokeStyle = '#083e69';
+    ctx.strokeStyle = '#ff2244';
     ctx.strokeText('Position de la souris: (' + mousex + ', ' + mousey + ')', 20, 20, 200);
 
     pointSuivant = { x: mousex, y: mousey };
@@ -67,7 +60,6 @@ canvas2D.addEventListener('mousemove', function (event) {
 
         const murInterieurBatiment = LES_BATIMENTS[i].mur_int;
         for (let j = 0; j < murInterieurBatiment.step[murInterieurBatiment.current].length; j++) {
-            console.log('redessinage des mur interieur ' + j);
             const mur = murInterieurBatiment.step[murInterieurBatiment.current][j];
             ctx.moveTo(mur[0].x, mur[0].y);
             ctx.lineTo(mur[1].x, mur[1].y);
@@ -78,7 +70,6 @@ canvas2D.addEventListener('mousemove', function (event) {
     if (drawSector === EXTERIEUR &&
         indexBatimentCourant >= 0 && LES_BATIMENTS[indexBatimentCourant].mur_ext.length > 0) {
         const mursDuBatiments = LES_BATIMENTS[indexBatimentCourant].mur_ext;
-
         ctx.moveTo(mursDuBatiments[mursDuBatiments.length - 1].x,
             mursDuBatiments[mursDuBatiments.length - 1].y);
         ctx.lineTo(pointSuivant.x, pointSuivant.y);
@@ -95,7 +86,6 @@ canvas2D.addEventListener('click', function () {
         if (drawSector === EXTERIEUR) {
             LES_BATIMENTS[indexBatimentCourant].mur_ext.push(pointSuivant);
         }
-        //Gestion de l'interieur du batiment
         if (drawSector === INTERIEUR) {
             if (murInterieurCourant.length < 2) {
                 murInterieurCourant.push(pointSuivant);
@@ -104,11 +94,9 @@ canvas2D.addEventListener('click', function () {
                 const batimentStep = LES_BATIMENTS[indexBatimentCourant].mur_int;
                 batimentStep.step[batimentStep.current].push(murInterieurCourant);
                 murInterieurCourant = [];
-                console.log("ADD mur");
             }
 
         }
-        //Dessiner en 3D
         create3DMap();
     }
 });
@@ -125,11 +113,10 @@ new_batiment_btn.addEventListener('click', function () {
     if (LES_BATIMENTS.length === 1) {
         delete_bat.classList.remove('btn-off');
     }
-
+    window.alert('Vous venez de créer un nouveau batiment <Batiment ' + LES_BATIMENTS.length + '>');
 });
 
 delete_bat.addEventListener('click', function () {
-    console.log(select_batiment.value);
     if (select_batiment.value !== 'none') {
         const option = document.querySelector('#select-bat option[ value="' + select_batiment.value + '"]');
         LES_BATIMENTS.splice(parseInt(select_batiment.value), 1);
@@ -138,6 +125,9 @@ delete_bat.addEventListener('click', function () {
             delete_bat.classList.add('btn-off');
         }
     }
+    document.querySelector('.step-control').classList.add('no-display');
+    indexBatimentCourant = -1;
+    window.alert('Vous venez de supprimer un batiment');
 });
 
 function clearRadioContainer() {
@@ -147,8 +137,7 @@ function clearRadioContainer() {
     }
 }
 
-select_batiment.addEventListener('change', function (event) {
-    console.log('SELECT CHANGE ' + select_batiment.value);
+select_batiment.addEventListener('change', function () {
     if (select_batiment.value !== 'none') {
         document.querySelector('.step-control').classList.remove('no-display');
         indexBatimentCourant = parseInt(select_batiment.value);
@@ -166,7 +155,6 @@ select_batiment.addEventListener('change', function (event) {
             document.querySelector('.radio-container').appendChild(radio);
             radio.addEventListener('click', function () {
                 batimentStep.current = i;
-                console.log("etage courant : " + batimentStep.current);
             });
         }
     } else {
@@ -190,7 +178,6 @@ add_step.addEventListener('click', function () {
         document.querySelector('.radio-container').appendChild(radio);
         radio.addEventListener('click', function () {
             batimentStep.current = i;
-            console.log("etage courant : " + batimentStep.current);
         });
     }
 });
@@ -198,6 +185,9 @@ add_step.addEventListener('click', function () {
 remove_step.addEventListener('click', function () {
     if (indexBatimentCourant >= 0) {
         const batimentStep = LES_BATIMENTS[indexBatimentCourant].mur_int;
+        if(batimentStep.step.length <= 1){
+            return;
+        }
         batimentStep.step.pop();
         batimentStep.current = batimentStep.step.length - 1;
         const radio_container = document.querySelector('.radio-container');
@@ -207,16 +197,15 @@ remove_step.addEventListener('click', function () {
 });
 
 //THREE JS
-
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, canvas3D.clientWidth / canvas3D.clientHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(60, canvas3D.clientWidth / canvas3D.clientHeight, 0.1, 4000);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas3D });
 renderer.setSize(canvas3D.clientWidth, canvas3D.clientHeight);
 
 const control = new THREE.OrbitControls(camera, renderer.domElement);
 camera.position.set(0, 10, 10);
 
-const DEFAULT_WALL_HEIGHT = 0.5;
+const DEFAULT_WALL_HEIGHT = 0.75;
 const DEFAULT_WALL_DEPTH = 0.05;
 
 function create3DMap() {
@@ -245,8 +234,10 @@ function create3DBatiment(batiment) {
         group.add(mesh);
         const current = batiment.mur_int.current;
         for (let i = 0; i < batiment.mur_int.step[j].length; i++) {
-            const p1 = normalize({ x: batiment.mur_int.step[current][i][0].x, y: batiment.mur_int.step[current][i][0].y });
-            const p2 = normalize({ x: batiment.mur_int.step[current][i][1].x, y: batiment.mur_int.step[current][i][1].y });
+            const p1 = normalize({ x: batiment.mur_int.step[current][i][0].x, 
+                y: batiment.mur_int.step[current][i][0].y });
+            const p2 = normalize({ x: batiment.mur_int.step[current][i][1].x,
+                y: batiment.mur_int.step[current][i][1].y });
             group.add(createMesh(p1, p2, j));
         }
     }
@@ -270,7 +261,8 @@ function createMesh(p1, p2, step) {
 }
 
 function normalize(p) {
-    return { x: (p.x / canvas3D.clientWidth) * 2 - 1, y: (p.y / canvas3D.clientHeight) * 2 + 1 };
+    const p2 =  { x: (p.x / canvas3D.clientWidth) * 2 - 1, y: (p.y / canvas3D.clientHeight) * 2 + 1 };
+    return p2;
 }
 
 function rotation(p1, p2) {

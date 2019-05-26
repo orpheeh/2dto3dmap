@@ -101,9 +101,12 @@ a.btn-off:hover {
     margin: 20px;
     padding: 20px;
     background-color: #7271b6;
-    height: 20vh;
     border-radius: 10px;
     font-size: 14px;
+}
+
+.draw-control input {
+    margin-right: 20px;
 }
 
 .radio-container * {
