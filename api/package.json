@@ -1,0 +1,15 @@
+{
+  "name": "2dto3dapi",
+  "version": "1.0.0",
+  "description": "L'API permettant d'enregistrer, modifer, ... une carte",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nve Hounkponou Orphée",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.0",
+    "mongoose": "^5.5.1"
+  }
+}

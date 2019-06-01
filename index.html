@@ -6,66 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
     <link href="https://fonts.googleapis.com/css?family=Rubik&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
-        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <title>2D to 3D Map</title>
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" 
+        crossorigin="anonymous">
+    <title>2D to 3D Map | Bienvenue</title>
 </head>
 
 <body>
-
     <header>
         <h1>2D to 3D Map</h1>
     </header>
 
     <div class="main-container">
-        <div class="canvas-container">
-            <canvas class="canvas-2d">
-            </canvas>
+        <div class="new-map-container">
+            <h1 class="option-title">
+                Créer une nouvelle carte
+            </h1>
 
-            <canvas class="canvas-3d">
-            </canvas>
+            <input type="text" name="map_name" id="map-name" placeholder="Nom de la carte">
+            <a href="#" class="btn" id="create">Créer</a>
         </div>
 
-        <div class="control-panel">
+        <div class="open-map-container">
+            <h1 class="option-title">
+                Ouvrir une carte existante
+            </h1>
 
-            <div class="draw-control">
-                <h1 class="title">Que dessiner?</h1>
-                <label for="draw">Murs Exterieur</label>
-                <input type="radio" name="draw" value="ext" checked = checked>
+            <select name="open" id="map-choose">
+                <option value="none"> --- Veuillez sélectionner une carte --- </option>
+            </select>
 
-                <label for="draw">Mur Interieur</label>
-                <input type="radio" name="draw" value="int">
-            </div>
-
-            <div class="batiment-control">
-                <h1 class="title">Batiments:</h1>
-                <select name="batiments" id="select-bat">
-                    <option value="none"> -- Sélectionnez un batiment -- </option>
-                </select>
-                <a href="#" class="btn" id="new-batiment"> <i class="fa fa-plus"></i> Ajouter</a>
-                <a href="#" class="btn" id="delete-bat" title="Supprimer le batiment"><i class="fa fa-minus"></i>
-                    Supprimer</a>
-
-            </div>
-
-            <div class="step-control no-display">
-                <h1 class="title">Etage:</h1>
-
-                <form class="radio-container">
-                </form>
-
-                <a href="#" class="btn" id="new-step"> <i class="fa fa-plus"></i> Ajouter</a>
-                <a href="#" class="btn" id="delete-step" title="Retirer un étage"><i class="fa fa-minus"></i>
-                    Supprimer</a>
-            </div>
+            <a href="#" class="btn" id="open">Ouvrir</a>
         </div>
     </div>
 
-
-    <script src="./three.js"></script>
-    <script src="./OrbitControls.js"></script>
-    <script src="./script.js"></script>
+    <script src="./index.js"></script>
 </body>
 
 </html>
