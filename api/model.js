@@ -13,7 +13,14 @@ const Map = mongoose.Schema({
                 current: Number
             }
         }
-    ]
+    ],
+    filename: {type: String, require: true}
 });
 
 module.export = mongoose.model('Map', Map);
+
+const Image = mongoose.Schema({
+    filename: String
+});
+
+module.export = mongoose.model('Image', Image);

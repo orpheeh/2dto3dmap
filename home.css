@@ -1,41 +1,61 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
 
-.main-container div {
-    display: inline-block;
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+header {
+    background-color: rgb(41, 41, 151);
+    width: 100%;   
+}
+
+header h1 {
     padding: 20px;
-    width: 45%;
-    height: 300px;
-    vertical-align: top;
-    box-shadow: 2px 5px 10px #cccccc;
-    background-color: #eeeeee;
-    margin: 20px;
+    color: white;
+    font-weight: normal;
+    font-size: 20px;
 }
 
 .main-container {
-   width: 100%;
-   height: 50%;
-   transform: translateY(50%); 
-   text-align: center;
-   font-family: 'Rubik' sans-serif;
+    display: flex;
+    margin: 100px;
 }
 
-.main-container input {
-    padding: 15px;
-    border: none;
-    width: 100%;
-    margin: 10px;
-    border-bottom: 4px solid tomato;
+.main-container > div {
+    text-align: center;
+    padding: 20px;
+    flex-grow: 0.5;
+    flex-shrink: 1;
 }
 
-.main-container select {
-    padding: 15px;
-    border:none;
-    border-bottom: 4px solid tomato;
-    width: 100%;
-    margin: 10px;
-}
-
-.option-title {
-    margin-top: 20px;
+.main-container > div h1 {
+    font-weight: normal;
+    border-bottom: 2px solid #cccccc;
+    padding-bottom: 10px;
     margin-bottom: 20px;
-    color: tomato;
+}
+
+.main-container > div input, select {
+    padding: 10px;
+    width: 80%;
+    margin: 20px;
+    border: 1px solid #cccccc;
+}
+
+.btn {
+    padding: 10px 20px;
+    color: white;
+    background-color: rgb(41, 41, 151);
+    text-decoration: none;
+    margin: 20px;
+    display: inline-block; 
+}
+
+footer {
+    color: #bbbbbb;
+    text-align: center;
 }
