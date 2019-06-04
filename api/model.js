@@ -18,9 +18,3 @@ const Map = mongoose.Schema({
 });
 
 module.export = mongoose.model('Map', Map);
-
-const Image = mongoose.Schema({
-    filename: String
-});
-
-module.export = mongoose.model('Image', Image);

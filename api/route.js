@@ -17,7 +17,6 @@ const upload = multer({
  });
 
 require('./model');
-const Image = mongoose.model('Image');
 const Map = mongoose.model('Map');
 
 module.exports = function (app) {
@@ -33,6 +32,7 @@ module.exports = function (app) {
 
     app.post('/upload', upload.single('map'), function (req, res, next) {
         const map = new Map(req.body);
+        console.log(map);
         map.filename = req.file.filename;
         map.save((err, newmap) => {
             if(err)
@@ -47,14 +47,6 @@ module.exports = function (app) {
                 res.send(err);
             }
             res.download(__dirname + '/uploads/' + img.filename);
-        });
-    });
-
-    app.get('/images', function(req, res){
-        Image.find({}, function(err, imgs){
-            if(err)
-                res.send(err);
-            res.json(imgs);
         });
     });
 }
