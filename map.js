@@ -20,11 +20,11 @@ function Batiment() {
         if (this.drawSector === this.CONTOUR) {
             this.mur_ext.push(point);
         } else {
-            const last = this.mur_int.step[currentStep].length - 1;
-            if (this.mur_int.step[currentStep][last].length === 2) {
-                this.mur_int.step[currentStep].push([point]);
+            const last = this.mur_int.step[this.currentStep].length - 1;
+            if (last < 0 || this.mur_int.step[this.currentStep][last].length === 2) {
+                this.mur_int.step[this.currentStep].push([point]);
             } else {
-                this.mur_int.step[currentStep][last].push(point);
+                this.mur_int.step[this.currentStep][last].push(point);
             }
         }
     }
@@ -45,8 +45,8 @@ function Batiment() {
     /**
      * Retourne le dernier mur interieur
      */
-    this.getLastInnerWalk = function () {
-        return mur_int.step[currentStep][mur_int.step[currentStep].length - 1];
+    this.getLastInnerWall = function () {
+        return this.mur_int.step[this.currentStep][this.mur_int.step[this.currentStep].length - 1];
     }
 }
 

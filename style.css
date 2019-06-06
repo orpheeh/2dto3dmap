@@ -96,3 +96,7 @@ select {
 .not-allow-step {
     color: #eeeeee;
 }
+
+.current {
+    background-color: rgb(115, 115, 196);
+}

@@ -120,6 +120,8 @@ function main() {
             const murInterieurBatiment = MAP.batiments[i].mur_int;
             for (let j = 0; j < murInterieurBatiment.step[MAP.batiments[i].currentStep].length; j++) {
                 const mur = murInterieurBatiment.step[MAP.batiments[i].currentStep][j];
+                if (mur.length < 2)
+                    continue;
                 ctx.moveTo(mur[0].x, mur[0].y);
                 ctx.lineTo(mur[1].x, mur[1].y);
                 ctx.stroke();
@@ -138,9 +140,9 @@ function main() {
             ctx.stroke();
         } else if (currentBatiment !== null &&
             currentBatiment.drawSector === currentBatiment.INTERIEUR) {
-            const murInterieurCourant = currentBatiment.getLastInnerWalk();
+            const murInterieurCourant = currentBatiment.getLastInnerWall();
 
-            if (murInterieurCourant.length === 1) {
+            if (murInterieurCourant !== undefined && murInterieurCourant.length === 1) {
                 ctx.moveTo(murInterieurCourant[0].x, murInterieurCourant[0].y);
                 ctx.lineTo(pointSuivant.x, pointSuivant.y);
                 ctx.stroke();
@@ -156,6 +158,44 @@ function main() {
         }
     });
 
+    updateDrawSection();
+    changeStep();
+
+}
+
+function updateDrawSection() {
+    const radios = document.querySelectorAll('.draw-control input');
+    for (let i = 0; i < radios.length; i++) {
+        radios[i].addEventListener('change', function (event) {
+            if (MAP.selectedBatiment < 0) {
+                return;
+            }
+            if (radios[i].checked) {
+                MAP.getSelectedBatiment().setDrawSection(parseInt(radios[i].value, 10));
+                console.log(MAP.getSelectedBatiment());
+            }
+        });
+    }
+}
+
+function changeStep() {
+    const steps = document.querySelectorAll('.step');
+    for (let i = 0; i < steps.length; i++) {
+        steps[i].addEventListener('click', function () {
+            if (steps[i].classList.contains('not-allow-step') === false) {
+                uncheckAllStep();
+                steps[i].classList.add('current');
+                MAP.setCurrentStepOfSelectedBatiment(i);
+            }
+        });
+    }
+}
+
+function uncheckAllStep() {
+    const steps = document.querySelectorAll('.step');
+    for (let i = 0; i < steps.length; i++) {
+        steps[i].classList.remove('current');
+    }
 }
 
 /**
@@ -210,22 +250,24 @@ function create3DBatiment(batiment) {
             group.add(createMesh(p1, p2, j));
         }
         const geometry = new THREE.ShapeGeometry(ground);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = -Math.PI / 2;
         mesh.position.y = -DEFAULT_WALL_HEIGHT / 2 + j * DEFAULT_WALL_HEIGHT;
         group.add(mesh);
-        const current = batiment.mur_int.current;
+        const current = batiment.currentStep;
         for (let i = 0; i < batiment.mur_int.step[j].length; i++) {
-            const p1 = normalize({
-                x: batiment.mur_int.step[current][i][0].x,
-                y: batiment.mur_int.step[current][i][0].y
-            });
-            const p2 = normalize({
-                x: batiment.mur_int.step[current][i][1].x,
-                y: batiment.mur_int.step[current][i][1].y
-            });
-            group.add(createMesh(p1, p2, j));
+            if (batiment.mur_int.step[j][i].length === 2) {
+                const p1 = normalize({
+                    x: batiment.mur_int.step[j][i][0].x,
+                    y: batiment.mur_int.step[j][i][0].y
+                });
+                const p2 = normalize({
+                    x: batiment.mur_int.step[j][i][1].x,
+                    y: batiment.mur_int.step[j][i][1].y
+                });
+                group.add(createMesh(p1, p2, j));
+            }
         }
     }
     scene.add(group);
