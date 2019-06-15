@@ -42,11 +42,12 @@ module.exports = function (app) {
     });
 
     app.get('/download/:id', function(req, res){
-        Image.findById(req.params.id, function(err, img){
+        Map.findById(req.params.id, function(err, map){
             if(err){
                 res.send(err);
             }
-            res.download(__dirname + '/uploads/' + img.filename);
+            res.set('Content-Type', 'image/*');
+            res.sendFile(__dirname + '/uploads/' + map.filename);
         });
     });
 }

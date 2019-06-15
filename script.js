@@ -1,5 +1,9 @@
 const MAP = new Map();
+let MAP_ID = 0;
+let MAP_NAME;
 
+loadMapInfoFromURL();
+loadMapFromAPI();
 main();
 
 /**
@@ -88,18 +92,34 @@ function selectBatiment() {
     }
 }
 
+function loadMapInfoFromURL(){
+    const decode = decodeURI(window.location);
+    MAP_ID = decode.split('?id=')[1].split('&name')[0];
+    MAP_NAME = decode.split('&name=')[1];
+    console.log(MAP_ID + " " + MAP_NAME);
+}
+
+function loadMapFromAPI(){
+    request("http://localhost:3000/map/" + MAP_ID, "GET", {}, function(json){
+        console.log(json);
+    });
+}
+
 function main() {
     let offset = { x: 0, y: 0 };
     const canvas2DContainer = document.querySelector('.canvas-2d-container');
     canvas2DContainer.addEventListener('scroll', function (event) {
-        console.log("scroll : " + event.target.scrollLeft + ", " + event.target.scrollTop);
         offset.x = event.target.scrollLeft;
         offset.y = event.target.scrollTop;
     });
 
     const canvas2D = document.querySelector('.canvas-2d');
-    canvas2D.width = 800;
-    canvas2D.height = 800;
+    const img = document.createElement('img');
+    img.src  = 'http://127.0.0.1:3000/download/' + MAP_ID;
+    
+    canvas2D.width = img.width;
+    canvas2D.height = img.height;
+    canvas2D.style.backgroundImage ="url("+ img.src + ")";
 
     const ctx = canvas2D.getContext('2d');
     let pointSuivant = { x: 0, y: 0 };
@@ -109,51 +129,14 @@ function main() {
         pointSuivant = { x: mousex, y: mousey };
         //Dessiner tous les batiments précédents
         ctx.beginPath();
-        ctx.clearRect(0, 0, canvas2D.clientWidth, canvas2D.clientHeight);
-        for (let i = 0; i < MAP.batiments.length; i++) {
-            const mursExterieurDuBatiments = MAP.batiments[i].mur_ext;
-            for (let j = 0; j < mursExterieurDuBatiments.length - 1; j++) {
-                ctx.moveTo(mursExterieurDuBatiments[j].x, mursExterieurDuBatiments[j].y);
-                ctx.lineTo(mursExterieurDuBatiments[j + 1].x, mursExterieurDuBatiments[j + 1].y);
-                ctx.stroke();
-            }
-            const murInterieurBatiment = MAP.batiments[i].mur_int;
-            for (let j = 0; j < murInterieurBatiment.step[MAP.batiments[i].currentStep].length; j++) {
-                const mur = murInterieurBatiment.step[MAP.batiments[i].currentStep][j];
-                if (mur.length < 2)
-                    continue;
-                ctx.moveTo(mur[0].x, mur[0].y);
-                ctx.lineTo(mur[1].x, mur[1].y);
-                ctx.stroke();
-            }
-        }
-
-        const currentBatiment = MAP.getSelectedBatiment();
-        if (currentBatiment !== null &&
-            currentBatiment.drawSector === currentBatiment.CONTOUR &&
-            currentBatiment.mur_ext.length > 0) {
-
-            const mursDuBatiments = currentBatiment.mur_ext;
-            ctx.moveTo(mursDuBatiments[mursDuBatiments.length - 1].x,
-                mursDuBatiments[mursDuBatiments.length - 1].y);
-            ctx.lineTo(pointSuivant.x, pointSuivant.y);
-            ctx.stroke();
-        } else if (currentBatiment !== null &&
-            currentBatiment.drawSector === currentBatiment.INTERIEUR) {
-            const murInterieurCourant = currentBatiment.getLastInnerWall();
-
-            if (murInterieurCourant !== undefined && murInterieurCourant.length === 1) {
-                ctx.moveTo(murInterieurCourant[0].x, murInterieurCourant[0].y);
-                ctx.lineTo(pointSuivant.x, pointSuivant.y);
-                ctx.stroke();
-            }
-        }
+       draw2D(ctx, pointSuivant, canvas2D);
     });
 
     canvas2D.addEventListener('click', function () {
         const currentBatiment = MAP.getSelectedBatiment();
         if (currentBatiment !== null) {
             currentBatiment.addPoint(pointSuivant);
+            draw2D(ctx, pointSuivant, canvas2D);
             create3DMap();
         }
     });
@@ -161,6 +144,59 @@ function main() {
     updateDrawSection();
     changeStep();
 
+    window.addEventListener('keypress', function(event){
+        console.log(event.keyCode);
+        if(event.keyCode === 97){
+            //Retirer le dernier point du batiment selectionné
+            const batiment = MAP.getSelectedBatiment();
+            if(batiment !== null){
+                batiment.removeLastPoint();
+                draw2D(ctx, pointSuivant, canvas2D);
+            }
+        }
+    });
+}
+
+function draw2D(ctx, pointSuivant, canvas2D){
+    ctx.clearRect(0, 0, canvas2D.clientWidth, canvas2D.clientHeight);
+    for (let i = 0; i < MAP.batiments.length; i++) {
+        const mursExterieurDuBatiments = MAP.batiments[i].mur_ext;
+        for (let j = 0; j < mursExterieurDuBatiments.length - 1; j++) {
+            ctx.moveTo(mursExterieurDuBatiments[j].x, mursExterieurDuBatiments[j].y);
+            ctx.lineTo(mursExterieurDuBatiments[j + 1].x, mursExterieurDuBatiments[j + 1].y);
+            ctx.stroke();
+        }
+        const murInterieurBatiment = MAP.batiments[i].mur_int;
+        for (let j = 0; j < murInterieurBatiment.step[MAP.batiments[i].currentStep].length; j++) {
+            const mur = murInterieurBatiment.step[MAP.batiments[i].currentStep][j];
+            if (mur.length < 2)
+                continue;
+            ctx.moveTo(mur[0].x, mur[0].y);
+            ctx.lineTo(mur[1].x, mur[1].y);
+            ctx.stroke();
+        }
+    }
+
+    const currentBatiment = MAP.getSelectedBatiment();
+    if (currentBatiment !== null &&
+        currentBatiment.drawSector === currentBatiment.CONTOUR &&
+        currentBatiment.mur_ext.length > 0) {
+
+        const mursDuBatiments = currentBatiment.mur_ext;
+        ctx.moveTo(mursDuBatiments[mursDuBatiments.length - 1].x,
+            mursDuBatiments[mursDuBatiments.length - 1].y);
+        ctx.lineTo(pointSuivant.x, pointSuivant.y);
+        ctx.stroke();
+    } else if (currentBatiment !== null &&
+        currentBatiment.drawSector === currentBatiment.INTERIEUR) {
+        const murInterieurCourant = currentBatiment.getLastInnerWall();
+
+        if (murInterieurCourant !== undefined && murInterieurCourant.length === 1) {
+            ctx.moveTo(murInterieurCourant[0].x, murInterieurCourant[0].y);
+            ctx.lineTo(pointSuivant.x, pointSuivant.y);
+            ctx.stroke();
+        }
+    }
 }
 
 function updateDrawSection() {
@@ -220,7 +256,9 @@ function request(url, method, data, callback) {
 
 //THREE JS
 const canvas3D = document.querySelector('.canvas-3d');
+const canvas2D = document.querySelector('.canvas-2d');
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xfdeca6);
 const camera = new THREE.PerspectiveCamera(60, canvas3D.clientWidth / canvas3D.clientHeight, 0.1, 4000);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas3D });
 renderer.setSize(canvas3D.clientWidth, canvas3D.clientHeight);
@@ -250,7 +288,7 @@ function create3DBatiment(batiment) {
             group.add(createMesh(p1, p2, j));
         }
         const geometry = new THREE.ShapeGeometry(ground);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const material = new THREE.PointsMaterial({ color: 0xffffff, opacity: 0.5, transparent: true });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = -Math.PI / 2;
         mesh.position.y = -DEFAULT_WALL_HEIGHT / 2 + j * DEFAULT_WALL_HEIGHT;
@@ -278,7 +316,7 @@ function createMesh(p1, p2, step) {
     const height = DEFAULT_WALL_HEIGHT;
     const depth = DEFAULT_WALL_DEPTH;
     const geometry = new THREE.BoxGeometry(width, height, depth);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+    const material = new THREE.MeshNormalMaterial();
     const mesh = new THREE.Mesh(geometry, material);
     const rot = rotation(p2, p1);
     const middle = middlePoint(p1, p2);
@@ -290,7 +328,8 @@ function createMesh(p1, p2, step) {
 }
 
 function normalize(p) {
-    const p2 = { x: (p.x / canvas3D.clientWidth) * 2 - 1, y: (p.y / canvas3D.clientHeight) * 2 + 1 };
+    const scale = 10;
+    const p2 = { x: (p.x / canvas3D.clientWidth) * 2*scale - 1*scale, y: (p.y / canvas3D.clientHeight) * 2*scale + 1*scale };
     return p2;
 }
 

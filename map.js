@@ -30,6 +30,17 @@ function Batiment() {
     }
 
     /**
+     * Retire le dernier point du batiment à l'exterieur et le dernier mur de l'interieur
+     */
+    this.removeLastPoint = function(){
+        if(this.drawSector === this.CONTOUR){
+            this.mur_ext.pop();
+        } else {
+            this.mur_int.step[this.currentStep].pop();
+        }
+    }
+
+    /**
      * Change l'endroit on enregistre les points
      * 
      * @param {section} Number
