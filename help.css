@@ -25,7 +25,6 @@ nav a {
 }
 
 h1 {
-    font-family: Georgia, 'Times New Roman', Times, serif;
     text-align: center;
     padding: 20px;
     text-transform: uppercase;
@@ -52,7 +51,8 @@ h2 {
 }
 
 p {
-    font-size: 20px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 18px;
 }
 
 span {
@@ -73,7 +73,8 @@ ul {
 }
 
 li {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     padding: 10px;
     font-size: 20px;
-    font-style: italic;
+    color: #777777;
 }
