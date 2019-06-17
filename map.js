@@ -1,5 +1,6 @@
 
-function Batiment() {
+function Batiment(name) {
+    this.name = name;
     this.mur_ext = [];
     this.mur_int = {
         step: [
@@ -27,6 +28,14 @@ function Batiment() {
                 this.mur_int.step[this.currentStep][last].push(point);
             }
         }
+    }
+
+    this.getData = function(){
+        return  {
+            name: this.name,
+            mur_ext: this.mur_ext,
+            mur_int: this.mur_int
+        };
     }
 
     /**
@@ -64,6 +73,17 @@ function Batiment() {
 function Map() {
     this.batiments = [];
     this.selectedBatiment = -1;
+
+    this.getData = function(){
+        const obj = { };
+
+        const bat = [];
+        for(let i = 0; i < this.batiments.length; i++){
+            bat.push(this.batiments[i].getData());
+        }
+        obj.batiment = bat;
+        return obj;
+    }
 
     /**
      * Permet de sélectionner le batiment situé à la position @{index}
@@ -132,8 +152,13 @@ function Map() {
     /**
      * Ajoute un batiment dans la carte
      */
-    this.addBatiment = function () {
-        this.batiments.push(new Batiment());
+    this.addBatiment = function (name) {
+        this.batiments.push(new Batiment(name));
+        return this.batiments.length;
+    }
+
+    this.addLoadedBatiment = function(batiment){
+        this.batiments.push(batiment);
         return this.batiments.length;
     }
 

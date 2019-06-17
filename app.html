@@ -16,7 +16,7 @@
 
         <nav>
             <a href="./index.html" class="button">Accueil</a>
-            <div class="button" id="save">Enregistrer</div>
+            <div class="button" id="save" onclick="saveMap()">Enregistrer</div>
             <a href="./help.html" class="button">Aide</a>
         </nav>
     </header>
@@ -60,11 +60,22 @@
                 <div class="step not-allow-step">3</div>
                 <div class="step not-allow-step">4</div>
                 <div class="step not-allow-step">5</div>
-                <span class="button" title="Ajouter un étage au batiment sélectionné" onclick="addStepOnSelectedBatiment()">Ajouter</span>
-                <span class="button" title="Supprimer le dernier étage du batiment sélectionné" onclick="removeLastStepOnSelectedBatiment()">Retirer</span>
+                <span class="button" title="Ajouter un étage au batiment sélectionné"
+                    onclick="addStepOnSelectedBatiment()">Ajouter</span>
+                <span class="button" title="Supprimer le dernier étage du batiment sélectionné"
+                    onclick="removeLastStepOnSelectedBatiment()">Retirer</span>
             </div>
         </div>
 
+    </div>
+
+    <div class="modal" id="modal-creer-batiment">
+        <div class="modal-content">
+            <h1 class="title">Créer un batiment</h1>
+            <p>Ici vous pourrez créer un nouveau batiment</p>
+            <input type="text" placeholder="Nom du batiment"/>
+            <a href="#" class="button">Valider</a>
+        </div>
     </div>
 
     <script src="./three.js"></script>

@@ -4,19 +4,68 @@ let MAP_NAME;
 
 loadMapInfoFromURL();
 loadMapFromAPI();
+loadMap();
 main();
+
+function saveMap(){
+    const data = MAP.getData();
+    request("http://127.0.0.1:3000/map/" + MAP_ID, "PUT", JSON.stringify(data), function(json){
+        console.log(json);
+    });
+}
+
+function loadMap(){
+    const select = document.querySelector('#batiment-list');
+
+    request("http://127.0.0.1:3000/map/" + MAP_ID, "GET", JSON.stringify({}), function(json){
+        for(let i = 0; i < json.batiment.length; i++){
+            const batiment = new Batiment(json.batiment[i].name);
+            batiment.mur_ext = json.batiment[i].mur_ext;
+            batiment.mur_int = json.batiment[i].mur_int;
+            MAP.addLoadedBatiment(batiment);
+            
+            const option = document.createElement('option');
+            option.value = i + '';
+            option.innerHTML = batiment.name;
+            select.appendChild(option);
+            stepCount = batiment.mur_int.step.length;
+            if (stepCount > 0) {
+                const steps = document.querySelectorAll('.step');
+                for (let i = 1; i < stepCount; i++) {
+                    steps[i].classList.remove('not-allow-step');
+                }
+                create3DMap();
+            }
+        }
+    });
+}
 
 /**
  * Ajoute un batiment dans la map et mets à jour la liste
  *  <select id="batiment-list">
  */
 function addBatiment() {
-    const index = MAP.addBatiment();
-    const batimetListSelectDOM = document.querySelector('#batiment-list');
-    const option = document.createElement('option');
-    option.value = '' + index - 1;
-    option.innerHTML = 'Batiment ' + index;
-    batimetListSelectDOM.appendChild(option);
+    const modal = document.querySelector('#modal-creer-batiment');
+    modal.style.display = "block";
+    const validate = modal.querySelector('.button');
+    validate.addEventListener('click', function () {
+        const input = modal.querySelector('input');
+        if (input.value === "") {
+            input.style.border = "1px solid red";
+            input.style.borderBottom = "2px solid red";
+        } else {
+            const index = MAP.addBatiment(input.value);
+            const batimetListSelectDOM = document.querySelector('#batiment-list');
+            const option = document.createElement('option');
+            option.value = '' + index - 1;
+            option.innerHTML =  input.value;
+            batimetListSelectDOM.appendChild(option);
+            input.value = "";
+            input.style.border = "none";
+            input.style.borderBottom = "2px solid rgb(41, 41, 151)";
+            modal.style.display = "none";
+        }
+    });
 }
 
 /**
@@ -92,15 +141,15 @@ function selectBatiment() {
     }
 }
 
-function loadMapInfoFromURL(){
+function loadMapInfoFromURL() {
     const decode = decodeURI(window.location);
     MAP_ID = decode.split('?id=')[1].split('&name')[0];
     MAP_NAME = decode.split('&name=')[1];
     console.log(MAP_ID + " " + MAP_NAME);
 }
 
-function loadMapFromAPI(){
-    request("http://localhost:3000/map/" + MAP_ID, "GET", {}, function(json){
+function loadMapFromAPI() {
+    request("http://localhost:3000/map/" + MAP_ID, "GET", {}, function (json) {
         console.log(json);
     });
 }
@@ -115,11 +164,11 @@ function main() {
 
     const canvas2D = document.querySelector('.canvas-2d');
     const img = document.createElement('img');
-    img.src  = 'http://127.0.0.1:3000/download/' + MAP_ID;
-    
+    img.src = 'http://127.0.0.1:3000/download/' + MAP_ID;
+
     canvas2D.width = img.width;
     canvas2D.height = img.height;
-    canvas2D.style.backgroundImage ="url("+ img.src + ")";
+    canvas2D.style.backgroundImage = "url(" + img.src + ")";
 
     const ctx = canvas2D.getContext('2d');
     let pointSuivant = { x: 0, y: 0 };
@@ -129,7 +178,7 @@ function main() {
         pointSuivant = { x: mousex, y: mousey };
         //Dessiner tous les batiments précédents
         ctx.beginPath();
-       draw2D(ctx, pointSuivant, canvas2D);
+        draw2D(ctx, pointSuivant, canvas2D);
     });
 
     canvas2D.addEventListener('click', function () {
@@ -144,12 +193,12 @@ function main() {
     updateDrawSection();
     changeStep();
 
-    window.addEventListener('keypress', function(event){
+    window.addEventListener('keypress', function (event) {
         console.log(event.keyCode);
-        if(event.keyCode === 97){
+        if (event.keyCode === 97) {
             //Retirer le dernier point du batiment selectionné
             const batiment = MAP.getSelectedBatiment();
-            if(batiment !== null){
+            if (batiment !== null) {
                 batiment.removeLastPoint();
                 draw2D(ctx, pointSuivant, canvas2D);
             }
@@ -157,7 +206,7 @@ function main() {
     });
 }
 
-function draw2D(ctx, pointSuivant, canvas2D){
+function draw2D(ctx, pointSuivant, canvas2D) {
     ctx.clearRect(0, 0, canvas2D.clientWidth, canvas2D.clientHeight);
     for (let i = 0; i < MAP.batiments.length; i++) {
         const mursExterieurDuBatiments = MAP.batiments[i].mur_ext;
@@ -253,7 +302,6 @@ function request(url, method, data, callback) {
     xhr.send(data);
 }
 
-
 //THREE JS
 const canvas3D = document.querySelector('.canvas-3d');
 const canvas2D = document.querySelector('.canvas-2d');
@@ -329,7 +377,7 @@ function createMesh(p1, p2, step) {
 
 function normalize(p) {
     const scale = 10;
-    const p2 = { x: (p.x / canvas3D.clientWidth) * 2*scale - 1*scale, y: (p.y / canvas3D.clientHeight) * 2*scale + 1*scale };
+    const p2 = { x: (p.x / canvas3D.clientWidth) * 2 * scale - 1 * scale, y: (p.y / canvas3D.clientHeight) * 2 * scale + 1 * scale };
     return p2;
 }
 

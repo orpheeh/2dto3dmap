@@ -100,3 +100,55 @@ select {
 .current {
     background-color: rgb(115, 115, 196);
 }
+
+.modal {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 128);
+    opacity: 0.9;
+    display: none;
+}
+
+.modal-content {
+    transform: translate(50%, 50%);
+    width: 50%;
+    height: 50%;
+    background-color: #ffffff; 
+    text-align: center;
+    vertical-align: center;
+    transition: 0.4s;
+}
+
+.modal-content .button {
+    background-color: rgb(41, 41, 151);
+    padding: 10px 20px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: white;
+    display: inline-block;
+}
+
+.modal-content input {
+    width: 80%;
+    margin: 20px;
+    padding: 16px;
+    border: none;
+    border-bottom: 2px solid rgb(24, 24, 100);
+}
+
+.modal-content h1 {
+    padding: 20px;
+    border: none;
+    border-bottom: 2px solid rgb(41, 41, 151);
+    outline: none;
+    background-color: rgb(24, 24, 100);
+    color: white;
+}
+
+.modal-content p {
+    padding-top: 20px;
+}

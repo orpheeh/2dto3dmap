@@ -26,11 +26,12 @@ exports.create_map = function(req, res){
 }
 
 exports.update_map = function(req, res){
-    Map.findOneAndUpdate({_id: req.params.id }, req.body, function(err, doc){
+    Map.findOneAndUpdate({"_id" : req.params.id }, req.body, function(err, doc){
         if(err)
             res.send(err);
-        else
+        else{
             res.json(doc);
+        }
     });
 }
 

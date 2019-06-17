@@ -5,12 +5,12 @@ const Map = mongoose.Schema({
     name: { unique: true, require: true, type: String},
     batiment: [
         {
+            name: String,
             mur_ext: [ { x: Number, y: Number } ], 
             mur_int: {
                 step: [
                     [{x: Number, y: Number}]
                 ],
-                current: Number
             }
         }
     ],

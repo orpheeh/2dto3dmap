@@ -47,5 +47,6 @@ function request(url, method, data, callback){
         }
     }
     xhr.open(method, url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(data);
 }
